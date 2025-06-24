@@ -1,25 +1,25 @@
 import { Acesso } from '../models/Acesso.js';
 import { Veiculo } from '../models/Veiculo.js';
 import { Usuario } from '../models/Usuario.js';
-import jwt from 'jsonwebtoken';
 import { Admin } from '../models/Admin.js';
+import jwt from 'jsonwebtoken';
 
-export const loginAdmin = async (req, res) => {
-  const { email, senha } = req.body;
-
-  const admin = await Admin.findOne({ where: { email } });
-
-  if (!admin || admin.senha !== senha) {
-    return res.status(401).json({ error: 'Credenciais inválidas.' });
+export const listarUsuarios = async (req, res) => {
+  try {
+    const usuarios = await Usuario.findAll();
+    res.json(usuarios);
+  } catch (error) {
+    res.status(500).json({ error: 'Erro ao listar usuários.' });
   }
+};
 
-  const token = jwt.sign(
-    { id: admin.id_admin, email: admin.email, tipo: 'admin' },
-    'segredo_jwt',
-    { expiresIn: '1h' }
-  );
-
-  res.json({ token });
+export const listarVeiculos = async (req, res) => {
+  try {
+    const veiculos = await Veiculo.findAll();
+    res.json(veiculos);
+  } catch (error) {
+    res.status(500).json({ error: 'Erro ao listar veículos.' });
+  }
 };
 
 export const listarAcessos = async (req, res) => {
@@ -34,4 +34,23 @@ export const listarAcessos = async (req, res) => {
   } catch (error) {
     res.status(500).json({ error: 'Erro ao listar acessos.' });
   }
+};
+
+export const loginAdmin = async (req, res) => {
+  const { email, senha } = req.body;
+
+  const admin = await Admin.findOne({ where: { email } });
+
+  if (!admin || admin.senha !== senha) {
+    return res.status(401).json({ error: 'Credenciais inválidas.' });
+  }
+
+  // ✅ Usa a variável de ambiente
+  const token = jwt.sign(
+    { id: admin.id_admin, email: admin.email, tipo: 'admin' },
+    process.env.SEGREDO_JWT,
+    { expiresIn: '1h' }
+  );
+
+  res.json({ token });
 };

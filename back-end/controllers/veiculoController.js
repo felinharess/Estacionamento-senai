@@ -29,3 +29,19 @@ export const listarVeiculosPorUsuario = async (req, res) => {
     res.status(500).json({ "Mensagem": error});
   }
 };
+// Buscar veículo por placa
+export const buscarVeiculoPorPlaca = async (req, res) => {
+  try {
+    const { placa } = req.params;
+    const veiculo = await Veiculo.findOne({ where: { placa } });
+
+    if (!veiculo) {
+      return res.status(404).json({ error: 'Veículo não encontrado.' });
+    }
+
+    res.status(200).json(veiculo);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Erro ao buscar veículo.' });
+  }
+};

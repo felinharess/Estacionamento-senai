@@ -1,5 +1,6 @@
 import { Acesso } from '../models/Acesso.js';
 
+// Registrar entrada
 export const registrarEntrada = async (req, res) => {
   try {
     const { id_veiculo, data_entrada, hora_entrada } = req.body;
@@ -13,9 +14,11 @@ export const registrarEntrada = async (req, res) => {
 
     res.status(201).json(acesso);
   } catch (error) {
+    console.error(error);
     res.status(500).json({ error: 'Erro ao registrar entrada.' });
   }
 };
+
 
 export const registrarSaida = async (req, res) => {
   try {

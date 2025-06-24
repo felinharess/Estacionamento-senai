@@ -22,7 +22,7 @@ export const Acesso = database.define('acesso', {
   hora_saida: DataTypes.TIME,
   status: DataTypes.ENUM('ativo', 'concluido', 'pendente') 
 }, {
-  timestamps: false
+  timestamps: true
 });
 
 Veiculo.hasMany(Acesso, { foreignKey: 'id_veiculo' });
