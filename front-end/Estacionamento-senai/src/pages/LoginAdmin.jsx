@@ -14,7 +14,7 @@ export default function LoginAdmin() {
     e.preventDefault();
     try {
       setLoading(true);
-      const response = await axios.post('http://localhost:3000/admin/login', {
+      const response = await axios.post('https://estacionamento-senai-3eik.onrender.com/admin/login', {
         email,
         senha
       });

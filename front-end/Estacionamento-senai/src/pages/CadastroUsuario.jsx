@@ -10,7 +10,7 @@ export default function CadastroUsuario() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.post('http://localhost:3000/usuarios', {
+      await axios.post('https://estacionamento-senai-3eik.onrender.com/usuarios', {
         nome,
         email,
         senha

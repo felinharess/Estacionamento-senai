@@ -28,9 +28,9 @@ export default function DashboardAdmin() {
       }
 
       const [usuariosRes, veiculosRes, acessosRes] = await Promise.all([
-        axios.get('http://localhost:3000/admin/usuarios', { headers: { Authorization: `Bearer ${token}` } }),
-        axios.get('http://localhost:3000/admin/veiculos', { headers: { Authorization: `Bearer ${token}` } }),
-        axios.get('http://localhost:3000/admin/acessos', { headers: { Authorization: `Bearer ${token}` } }),
+        axios.get('https://estacionamento-senai-3eik.onrender.com/admin/usuarios', { headers: { Authorization: `Bearer ${token}` } }),
+        axios.get('https://estacionamento-senai-3eik.onrender.com/admin/veiculos', { headers: { Authorization: `Bearer ${token}` } }),
+        axios.get('https://estacionamento-senai-3eik.onrender.com/admin/acessos', { headers: { Authorization: `Bearer ${token}` } }),
       ]);
 
       setUsuarios(usuariosRes.data);

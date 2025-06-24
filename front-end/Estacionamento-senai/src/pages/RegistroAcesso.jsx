@@ -29,40 +29,57 @@ export default function RegistroAcesso() {
         return;
       }
 
+      // Buscar o veículo pela placa
+      const veiculoResponse = await axios.get(
+        `https://estacionamento-senai-3eik.onrender.com/veiculos/placa/${placa}`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      const veiculo = veiculoResponse.data;
+
+      if (!veiculo || !veiculo.id_veiculo) {
+        alert('Veículo não encontrado.');
+        setLoading(false);
+        return;
+      }
+
+      const agora = new Date();
+      const dataAtual = agora.toISOString().split('T')[0];
+      const horaAtual = agora.toTimeString().split(' ')[0];
+
       if (acao === 'entrada') {
-        // 1. Buscar o veículo pela placa
-        const veiculoResponse = await axios.get(
-          `http://localhost:3000/veiculos/placa/${placa}`,
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
-
-        const veiculo = veiculoResponse.data;
-
-        if (!veiculo || !veiculo.id_veiculo) {
-          alert('Veículo não encontrado.');
-          setLoading(false);
-          return;
-        }
-
-        // 2. Montar data e hora
-        const agora = new Date();
-        const data_entrada = agora.toISOString().split('T')[0]; // yyyy-mm-dd
-        const hora_entrada = agora.toTimeString().split(' ')[0]; // hh:mm:ss
-
-        // 3. Registrar entrada
+        // Registrar entrada
         await axios.post(
-          'http://localhost:3000/acessos/entrada',
+          'https://estacionamento-senai-3eik.onrender.com/acessos/entrada',
           {
             id_veiculo: veiculo.id_veiculo,
-            data_entrada,
-            hora_entrada
+            data_entrada: dataAtual,
+            hora_entrada: horaAtual
           },
           { headers: { Authorization: `Bearer ${token}` } }
         );
       } else {
-        alert('Funcionalidade de saída ainda não implementada.');
-        setLoading(false);
-        return;
+        // Buscar acesso ativo
+        const acessoResponse = await axios.get(
+          `https://estacionamento-senai-3eik.onrender.com/acessos/ativos/${veiculo.id_veiculo}`,
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+        const acessoAtivo = acessoResponse.data;
+
+        if (!acessoAtivo || !acessoAtivo.id_acesso) {
+          alert('Nenhum acesso ativo encontrado para este veículo.');
+          setLoading(false);
+          return;
+        }
+
+        // Registrar saída
+        await axios.put(
+          `https://estacionamento-senai-3eik.onrender.com/acessos/saida/${acessoAtivo.id_acesso}`,
+          {
+            data_saida: dataAtual,
+            hora_saida: horaAtual
+          },
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
       }
 
       setSuccess(true);

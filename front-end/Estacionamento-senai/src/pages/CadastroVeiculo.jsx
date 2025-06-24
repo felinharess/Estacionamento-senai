@@ -19,7 +19,6 @@ export default function CadastroVeiculo() {
       return;
     }
 
-    // Verificação simples no front-end antes do envio
     if (!placa || !modelo || !cor) {
       alert('Por favor, preencha todos os campos obrigatórios.');
       return;
@@ -28,7 +27,7 @@ export default function CadastroVeiculo() {
     try {
       setLoading(true);
 
-      const response = await axios.post('http://localhost:3000/veiculos', {
+      const response = await axios.post('https://estacionamento-senai-3eik.onrender.com/veiculos', {
         placa,
         modelo,
         cor,
@@ -42,7 +41,6 @@ export default function CadastroVeiculo() {
       alert('Veículo cadastrado com sucesso!');
       navigate('/registro-acesso');
 
-      // Limpar os campos após sucesso
       setPlaca('');
       setModelo('');
       setCor('');

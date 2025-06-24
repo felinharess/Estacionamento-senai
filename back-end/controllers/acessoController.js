@@ -1,6 +1,5 @@
 import { Acesso } from '../models/Acesso.js';
 
-// Registrar entrada
 export const registrarEntrada = async (req, res) => {
   try {
     const { id_veiculo, data_entrada, hora_entrada } = req.body;
@@ -38,5 +37,26 @@ export const registrarSaida = async (req, res) => {
     res.json(acesso);
   } catch (error) {
     res.status(500).json({ error: 'Erro ao registrar saída.' });
+  }
+};
+export const buscarAcessoAtivo = async (req, res) => {
+  const { id_veiculo } = req.params;
+
+  try {
+    const acesso = await Acesso.findOne({
+      where: {
+        id_veiculo,
+        status: 'ativo'
+      },
+      order: [['data_entrada', 'DESC']]
+    });
+
+    if (!acesso) {
+      return res.status(404).json({ error: 'Acesso ativo não encontrado.' });
+    }
+
+    res.json(acesso);
+  } catch (error) {
+    res.status(500).json({ error: 'Erro ao buscar acesso ativo.' });
   }
 };

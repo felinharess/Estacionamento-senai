@@ -45,7 +45,6 @@ export const loginAdmin = async (req, res) => {
     return res.status(401).json({ error: 'Credenciais inválidas.' });
   }
 
-  // ✅ Usa a variável de ambiente
   const token = jwt.sign(
     { id: admin.id_admin, email: admin.email, tipo: 'admin' },
     process.env.SEGREDO_JWT,
