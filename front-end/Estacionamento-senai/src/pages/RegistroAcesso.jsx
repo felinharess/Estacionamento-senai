@@ -1,15 +1,40 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { FiCheckCircle, FiTruck, FiLogIn, FiLogOut } from 'react-icons/fi';
 import { useNavigate } from 'react-router-dom';
 import './RegistroAcesso.css';
+
+const TOTAL_VAGAS = 100; // total de vagas do estacionamento
 
 export default function RegistroAcesso() {
   const [placa, setPlaca] = useState('');
   const [acao, setAcao] = useState('entrada');
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [vagasDisponiveis, setVagasDisponiveis] = useState(TOTAL_VAGAS);
   const navigate = useNavigate();
+
+  const token = localStorage.getItem('token');
+
+  // Função para buscar vagas disponíveis no backend (quantidade de acessos ativos)
+  const atualizarVagasDisponiveis = async () => {
+    if (!token) return;
+    try {
+      const res = await axios.get(
+        'https://estacionamento-senai-3eik.onrender.com/acessos/ativos/count',
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      // A resposta deve retornar a quantidade de acessos ativos
+      const acessosAtivos = res.data.count ?? 0;
+      setVagasDisponiveis(TOTAL_VAGAS - acessosAtivos);
+    } catch (error) {
+      console.error('Erro ao atualizar vagas disponíveis:', error);
+    }
+  };
+
+  useEffect(() => {
+    atualizarVagasDisponiveis();
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -19,15 +44,13 @@ export default function RegistroAcesso() {
       return;
     }
 
+    if (!token) {
+      alert('Usuário não autenticado. Faça login.');
+      return;
+    }
+
     try {
       setLoading(true);
-      const token = localStorage.getItem('token');
-
-      if (!token) {
-        alert('Usuário não autenticado. Faça login.');
-        setLoading(false);
-        return;
-      }
 
       // Buscar o veículo pela placa
       const veiculoResponse = await axios.get(
@@ -47,16 +70,22 @@ export default function RegistroAcesso() {
       const horaAtual = agora.toTimeString().split(' ')[0];
 
       if (acao === 'entrada') {
+        if (vagasDisponiveis <= 0) {
+          alert('Não há vagas disponíveis no momento.');
+          setLoading(false);
+          return;
+        }
         // Registrar entrada
         await axios.post(
           'https://estacionamento-senai-3eik.onrender.com/acessos/entrada',
           {
             id_veiculo: veiculo.id_veiculo,
             data_entrada: dataAtual,
-            hora_entrada: horaAtual
+            hora_entrada: horaAtual,
           },
           { headers: { Authorization: `Bearer ${token}` } }
         );
+        setVagasDisponiveis((v) => v - 1); // decrementa vagas
       } else {
         // Buscar acesso ativo
         const acessoResponse = await axios.get(
@@ -76,10 +105,11 @@ export default function RegistroAcesso() {
           `https://estacionamento-senai-3eik.onrender.com/acessos/saida/${acessoAtivo.id_acesso}`,
           {
             data_saida: dataAtual,
-            hora_saida: horaAtual
+            hora_saida: horaAtual,
           },
           { headers: { Authorization: `Bearer ${token}` } }
         );
+        setVagasDisponiveis((v) => v + 1); // incrementa vagas
       }
 
       setSuccess(true);
@@ -98,6 +128,10 @@ export default function RegistroAcesso() {
         <div className="registro-header">
           <FiTruck size={24} className="header-icon" />
           <h2>Registro de Acesso Veicular</h2>
+        </div>
+
+        <div className="vagas-disponiveis">
+          <strong>Vagas Disponíveis:</strong> {vagasDisponiveis}
         </div>
 
         <form onSubmit={handleSubmit} className="registro-form">
@@ -173,3 +207,4 @@ export default function RegistroAcesso() {
     </div>
   );
 }
+  

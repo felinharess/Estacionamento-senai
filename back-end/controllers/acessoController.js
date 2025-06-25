@@ -60,3 +60,13 @@ export const buscarAcessoAtivo = async (req, res) => {
     res.status(500).json({ error: 'Erro ao buscar acesso ativo.' });
   }
 };
+export const contarAcessosAtivos = async (req, res) => {
+  try {
+    // Conta quantos registros estão com status "ativo"
+    const count = await Acesso.count({ where: { status: 'ativo' } });
+    res.json({ count });
+  } catch (error) {
+    console.error('Erro ao contar acessos ativos:', error);
+    res.status(500).json({ error: 'Erro ao contar acessos ativos.' });
+  }
+};
