@@ -62,7 +62,6 @@ export const buscarAcessoAtivo = async (req, res) => {
 };
 export const contarAcessosAtivos = async (req, res) => {
   try {
-    // Conta quantos registros estão com status "ativo"
     const count = await Acesso.count({ where: { status: 'ativo' } });
     res.json({ count });
   } catch (error) {
