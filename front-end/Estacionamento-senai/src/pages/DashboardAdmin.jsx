@@ -1,8 +1,12 @@
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 import './DashboardAdmin.css';
-import { FiUsers, FiTruck, FiClock, FiActivity, FiRefreshCw } from 'react-icons/fi';
+import { 
+  FiUsers, FiTruck, FiClock, FiActivity, FiRefreshCw, FiLogIn, FiLogOut, FiMapPin 
+} from 'react-icons/fi';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+
+const TOTAL_VAGAS = 100;
 
 export default function DashboardAdmin() {
   const [usuarios, setUsuarios] = useState([]);
@@ -13,7 +17,10 @@ export default function DashboardAdmin() {
     totalUsuarios: 0,
     totalVeiculos: 0,
     acessosHoje: 0,
-    acessosUltimaHora: 0
+    acessosUltimaHora: 0,
+    acessosAtivos: 0,
+    acessosDesativos: 0,
+    vagasDisponiveis: TOTAL_VAGAS
   });
 
   const fetchData = async () => {
@@ -37,15 +44,19 @@ export default function DashboardAdmin() {
       setVeiculos(veiculosRes.data);
       setAcessos(acessosRes.data);
 
-      // Processar estatísticas com checagem para createdAt
       const hoje = new Date().toISOString().split('T')[0];
       const umaHoraAtras = new Date(Date.now() - 3600000).toISOString();
+
+      const acessosAtivos = acessosRes.data.filter(a => a.status === 'ativo').length;
 
       setStats({
         totalUsuarios: usuariosRes.data.length,
         totalVeiculos: veiculosRes.data.length,
         acessosHoje: acessosRes.data.filter(a => a.createdAt && a.createdAt.includes(hoje)).length,
-        acessosUltimaHora: acessosRes.data.filter(a => a.createdAt && a.createdAt >= umaHoraAtras).length
+        acessosUltimaHora: acessosRes.data.filter(a => a.createdAt && a.createdAt >= umaHoraAtras).length,
+        acessosAtivos,
+        acessosDesativos: acessosRes.data.filter(a => a.status !== 'ativo').length,
+        vagasDisponiveis: TOTAL_VAGAS - acessosAtivos
       });
 
       setLoading(false);
@@ -59,7 +70,6 @@ export default function DashboardAdmin() {
     fetchData();
   }, []);
 
-  // Preparar dados para o gráfico com checagem para createdAt
   const prepareChartData = () => {
     const hoje = new Date();
     const ultimos7Dias = [...Array(7)].map((_, i) => {
@@ -108,6 +118,24 @@ export default function DashboardAdmin() {
           title="Última Hora"
           value={stats.acessosUltimaHora}
           color="#e74a3b"
+        />
+        <StatCard
+          icon={<FiLogIn size={24} />}
+          title="Veículos Estacionados"
+          value={stats.acessosAtivos}
+          color="#2d9cdb"
+        />
+        <StatCard
+          icon={<FiLogOut size={24} />}
+          title="Saídas Informadas"
+          value={stats.acessosDesativos}
+          color="#d02d2d"
+        />
+        <StatCard
+          icon={<FiMapPin size={24} />}
+          title="Vagas Disponíveis"
+          value={stats.vagasDisponiveis}
+          color="#10b981"
         />
       </div>
 
@@ -165,7 +193,6 @@ export default function DashboardAdmin() {
   );
 }
 
-// Componente de Card de Estatística
 function StatCard({ icon, title, value, color }) {
   return (
     <div className="stat-card" style={{ borderBottom: `4px solid ${color}` }}>
@@ -180,7 +207,6 @@ function StatCard({ icon, title, value, color }) {
   );
 }
 
-// Componente de Tabela de Dados
 function DataTable({ title, data, columns, icon, fullWidth = false }) {
   return (
     <div className={`data-table ${fullWidth ? 'full-width' : ''}`}>
