@@ -25,24 +25,29 @@ export const listarVeiculos = async (req, res) => {
 };
 
 
-// Listar acessos com veículo e usuário
 export const listarAcessos = async (req, res) => {
   try {
     const acessos = await Acesso.findAll({
       include: [
         {
           model: Veiculo,
-          include: Usuario
+          include: [
+            {
+              model: Usuario
+            }
+          ]
         }
       ],
-      order: [['createdAt', 'DESC']]
+      order: [['createdAt', 'DESC']],
     });
+
     res.json(acessos);
   } catch (error) {
     console.error('Erro ao listar acessos:', error);
     res.status(500).json({ error: 'Erro ao listar acessos.' });
   }
 };
+
 
 // Login do administrador
 export const loginAdmin = async (req, res) => {

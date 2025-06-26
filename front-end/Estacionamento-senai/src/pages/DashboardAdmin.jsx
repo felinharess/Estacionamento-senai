@@ -108,7 +108,10 @@ export default function DashboardAdmin() {
     return days;
   })();
 
-  const ultimosAcessos = acessos.slice().sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).slice(0, 5);
+  const ultimosAcessos = acessos
+    .slice()
+    .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+    .slice(0, 5);
 
   return (
     <div className="dashboard-admin">
@@ -148,7 +151,8 @@ export default function DashboardAdmin() {
         <ul>
           {ultimosAcessos.map((a, i) => (
             <li key={i}>
-              Veículo: {a.veiculo?.placa || '---'} | Data: {new Date(a.createdAt).toLocaleDateString()} | Hora: {new Date(a.createdAt).toLocaleTimeString()}
+              <strong>{a.veiculo?.Usuario?.nome || '—'}</strong> – Veículo: {a.veiculo?.placa || '—'} |{' '}
+              {new Date(a.createdAt).toLocaleDateString()} às {new Date(a.createdAt).toLocaleTimeString()}
             </li>
           ))}
         </ul>

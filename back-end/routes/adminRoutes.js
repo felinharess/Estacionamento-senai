@@ -15,7 +15,7 @@ const router = express.Router();
 
 router.post('/login', loginAdmin);
 
-router.get('/acessos', autenticar, listarAcessos);
+router.get('/', listarAcessos);
 
 router.get('/usuarios', autenticar, listarUsuarios);
 router.put('/usuarios/:id', autenticar, editarUsuario);      
