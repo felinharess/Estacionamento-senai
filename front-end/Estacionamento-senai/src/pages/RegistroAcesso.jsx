@@ -18,13 +18,9 @@ export default function RegistroAcesso() {
 
   // Função para buscar vagas disponíveis no backend (quantidade de acessos ativos)
   const atualizarVagasDisponiveis = async () => {
-    if (!token) return;
     try {
       const res = await axios.get(
-        'https://estacionamento-senai-3eik.onrender.com/acessos/ativos/count',
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-      // A resposta deve retornar a quantidade de acessos ativos
+        'https://estacionamento-senai-3eik.onrender.com/acessos/ativos/count',);
       const acessosAtivos = res.data.count ?? 0;
       setVagasDisponiveis(TOTAL_VAGAS - acessosAtivos);
     } catch (error) {
