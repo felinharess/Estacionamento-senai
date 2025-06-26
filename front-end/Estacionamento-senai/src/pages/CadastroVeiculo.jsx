@@ -19,7 +19,7 @@ export default function CadastroVeiculo() {
       return;
     }
 
-    if (!placa || !modelo || !cor) {
+    if (!placa || !modelo || !cor || !ano) {
       alert('Por favor, preencha todos os campos obrigatórios.');
       return;
     }

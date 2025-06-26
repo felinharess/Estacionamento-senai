@@ -1,11 +1,13 @@
 import { useState } from 'react';
 import axios from 'axios';
 import './CadastroUsuario.css'; // Importando o arquivo CSS
+import { useNavigate, Link } from 'react-router-dom';
 
 export default function CadastroUsuario() {
   const [nome, setNome] = useState('');
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
+  const navigate = useNavigate()
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -16,6 +18,7 @@ export default function CadastroUsuario() {
         senha
       });
       alert('Usuário cadastrado com sucesso!');
+      navigate('/')
     } catch (error) {
       alert('Erro ao cadastrar: ' + (error.response?.data?.mensagem || 'Erro desconhecido'));
     }

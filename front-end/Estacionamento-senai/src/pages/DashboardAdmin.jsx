@@ -30,23 +30,42 @@ export default function DashboardAdmin() {
       const [uRes, vRes, aRes] = await Promise.all([
         api.get('/usuarios'),
         api.get('/veiculos'),
-        api.get('/acessos'),
+        api.get('/'), // rota de acessos
       ]);
-      setUsuarios(uRes.data);
-      setVeiculos(vRes.data);
-      setAcessos(aRes.data);
+
+      const usuarios = uRes.data;
+      const veiculos = vRes.data;
+      const acessos = aRes.data;
+
+      setUsuarios(usuarios);
+      setVeiculos(veiculos);
+
+      // Junta acessos + veículo + usuário manualmente
+      const acessosCompletos = acessos.map(acesso => {
+        const veiculo = veiculos.find(v => v.id_veiculo === acesso.id_veiculo);
+        const usuario = usuarios.find(u => u.id_usuario === veiculo?.id_usuario);
+        return {
+          ...acesso,
+          veiculo: {
+            ...veiculo,
+            Usuario: usuario
+          }
+        };
+      });
+
+      setAcessos(acessosCompletos);
 
       const hoje = new Date().toISOString().slice(0,10);
       const umaHora = new Date(Date.now() - 3600000).toISOString();
-      const ativos = aRes.data.filter(a => a.status === 'ativo').length;
+      const ativos = acessosCompletos.filter(a => a.status === 'ativo').length;
 
       setStats({
-        totalUsuarios: uRes.data.length,
-        totalVeiculos: vRes.data.length,
-        acessosHoje: aRes.data.filter(a => a.createdAt.includes(hoje)).length,
-        acessosUltimaHora: aRes.data.filter(a => a.createdAt >= umaHora).length,
+        totalUsuarios: usuarios.length,
+        totalVeiculos: veiculos.length,
+        acessosHoje: acessosCompletos.filter(a => a.createdAt.includes(hoje)).length,
+        acessosUltimaHora: acessosCompletos.filter(a => a.createdAt >= umaHora).length,
         acessosAtivos: ativos,
-        acessosDesativos: aRes.data.length - ativos,
+        acessosDesativos: acessosCompletos.length - ativos,
         vagasDisponiveis: TOTAL_VAGAS - ativos
       });
 
